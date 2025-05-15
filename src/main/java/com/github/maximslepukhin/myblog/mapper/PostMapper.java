@@ -11,7 +11,6 @@ public class PostMapper {
         List<String> tagList = Arrays.asList(post.getTags().split(" "));
         List<String> textParts = Arrays.asList(post.getText().split("\n"));
         String tagsAsText = String.join(" ", tagList);
-        int commentCount = post.getComments().size();
 
         return new PostDto(
                 post.getId(),
