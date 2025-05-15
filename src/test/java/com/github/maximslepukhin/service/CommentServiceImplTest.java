@@ -1,29 +1,28 @@
 package com.github.maximslepukhin.service;
 
-import com.github.maximslepukhin.model.Post;
-import com.github.maximslepukhin.repository.CommentRepository;
+import com.github.maximslepukhin.myblog.model.Post;
+import com.github.maximslepukhin.myblog.repository.CommentRepository;
+import com.github.maximslepukhin.myblog.service.CommentServiceImpl;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import static org.mockito.Mockito.verify;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
+import static org.mockito.Mockito.times;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest(classes = CommentServiceImpl.class)
 class CommentServiceImplTest {
 
-    @Mock
+    @MockBean
     private CommentRepository commentRepository;
 
-    @InjectMocks
+    @Autowired
     private CommentServiceImpl commentService;
-
 
     @Test
     void shouldAddComment() {
-        commentService.addComment(1L,"Comment");
+        commentService.addComment(1L, "Comment");
         verify(commentRepository, times(1)).addComment(1L, "Comment");
     }
 

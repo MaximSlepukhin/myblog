@@ -1,55 +1,43 @@
 package com.github.maximslepukhin.controller;
 
-import com.github.maximslepukhin.WebConfiguration;
-import com.github.maximslepukhin.model.Post;
+import com.github.maximslepukhin.myblog.model.Post;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ExtendWith(SpringExtension.class)
-@WebAppConfiguration
-@ContextConfiguration(classes = WebConfiguration.class)
+@SpringBootTest
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
 @TestPropertySource(locations = "classpath:test-application.properties")
+@Transactional
 class HomeControllerTest {
 
     @Autowired
-    private WebApplicationContext webApplicationContext;
+    private MockMvc mockMvc;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    private MockMvc mockMvc;
-
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-
-        jdbcTemplate.execute("DELETE FROM posts");
-        jdbcTemplate.execute("DELETE FROM comments");
-        jdbcTemplate.execute("ALTER TABLE posts ALTER COLUMN id RESTART WITH 1;");
-        jdbcTemplate.execute("INSERT INTO posts (id, title, text, likesCount, tags)" +
-                             "VALUES (1, 'First title', 'First text', 1, 'tags1')");
-        jdbcTemplate.execute("INSERT INTO posts (id, title, text, likesCount, tags)" +
-                             "VALUES (2, 'Second title', 'Second text', 2, 'tags2')");
-
+        jdbcTemplate.update("INSERT INTO posts (id, title, text, likesCount, tags) VALUES (?, ?, ?, ?, ?)",
+                1L, "First title", "First text", 1, "tags1");
+        jdbcTemplate.update("INSERT INTO posts (id, title, text, likesCount, tags) VALUES (?, ?, ?, ?, ?)",
+                2L, "Second title", "Second text", 2, "tags2");
     }
 
     @Test
@@ -66,7 +54,7 @@ class HomeControllerTest {
                         .param("page", "0")
                         .param("size", "10"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType("text/html;charset=UTF-8"))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
                 .andExpect(view().name("posts"))
                 .andExpect(model().attributeExists("search"))
                 .andExpect(model().attributeExists("paging"))
@@ -117,18 +105,16 @@ class HomeControllerTest {
     }
 
     @Test
-    void should_showImage() {
-
-    }
-
-    @Test
     void should_addLike() throws Exception {
         mockMvc.perform(post("/posts/1/like")
                         .param("like", "true"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/posts/1"));
-        Integer totalLikes = jdbcTemplate.queryForObject("SELECT likesCount FROM posts WHERE id = ?", new Object[]{1}, Integer.class);
-        assertEquals(2, totalLikes);
+
+        Integer likes = jdbcTemplate.queryForObject(
+                "SELECT likesCount FROM posts WHERE id = ?",
+                Integer.class, 1L);
+        assertEquals(2, likes);
     }
 
     @Test
@@ -149,10 +135,14 @@ class HomeControllerTest {
                 "Tags",
                 null);
 
-        MockMultipartFile imageFile = new MockMultipartFile("image", "image.jpg", "image/jpeg", "image content".getBytes());
+        MockMultipartFile imageFile = new MockMultipartFile(
+                "image",
+                "image.jpg",
+                "image/jpeg",
+                "image content".getBytes());
 
         mockMvc.perform(multipart("/posts/{id}", postId)
-                        .file(imageFile) // добавляем файл изображения
+                        .file(imageFile)
                         .param("title", updatedPost.getTitle())
                         .param("tags", updatedPost.getTags())
                         .param("text", updatedPost.getText()))
@@ -163,31 +153,38 @@ class HomeControllerTest {
     @Test
     void should_addComment() throws Exception {
         mockMvc.perform(post("/posts/1/comments")
-                        .param("text", "text"))
+                        .param("text", "New comment"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrlTemplate("/posts/1"));
+                .andExpect(redirectedUrl("/posts/1"));
     }
 
     @Test
     void should_editComment() throws Exception {
-        mockMvc.perform(post("/posts/1/comments/1")
-                        .param("text", "text"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrlTemplate("/posts/1"));
-    }
+        jdbcTemplate.update(
+                "INSERT INTO comments (id, text, postId) VALUES (?, ?, ?)",
+                1L, "Old comment", 1L);
 
+        mockMvc.perform(post("/posts/1/comments/1")
+                        .param("text", "Updated comment"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/posts/1"));
+    }
 
     @Test
     void should_deleteComment() throws Exception {
+        jdbcTemplate.update(
+                "INSERT INTO comments (id, text, postId) VALUES (?, ?, ?)",
+                1L, "Comment to delete", 1L);
+
         mockMvc.perform(post("/posts/1/comments/1/delete"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrlTemplate("/posts/1"));
+                .andExpect(redirectedUrl("/posts/1"));
     }
 
     @Test
     void should_deletePostById() throws Exception {
         mockMvc.perform(post("/posts/1/delete"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrlTemplate("/posts"));
+                .andExpect(redirectedUrl("/posts"));
     }
 }

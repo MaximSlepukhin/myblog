@@ -1,7 +1,6 @@
-package com.github.maximslepukhin.service;
+package com.github.maximslepukhin.myblog.service;
 
-import com.github.maximslepukhin.model.Comment;
-import com.github.maximslepukhin.model.Post;
+import com.github.maximslepukhin.myblog.model.Post;
 
 public interface CommentService {
 

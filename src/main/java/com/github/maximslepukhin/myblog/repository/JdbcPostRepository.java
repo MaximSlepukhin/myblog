@@ -1,7 +1,7 @@
-package com.github.maximslepukhin.repository;
+package com.github.maximslepukhin.myblog.repository;
 
-import com.github.maximslepukhin.model.Comment;
-import com.github.maximslepukhin.model.Post;
+import com.github.maximslepukhin.myblog.model.Comment;
+import com.github.maximslepukhin.myblog.model.Post;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;

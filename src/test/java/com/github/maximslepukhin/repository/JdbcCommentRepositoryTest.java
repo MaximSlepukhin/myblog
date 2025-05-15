@@ -1,32 +1,33 @@
 package com.github.maximslepukhin.repository;
 
-import com.github.maximslepukhin.WebConfiguration;
-import com.github.maximslepukhin.model.Comment;
-import com.github.maximslepukhin.model.Post;
+import com.github.maximslepukhin.myblog.model.Comment;
+import com.github.maximslepukhin.myblog.model.Post;
+import com.github.maximslepukhin.myblog.repository.CommentRepository;
+import com.github.maximslepukhin.myblog.repository.JdbcCommentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(SpringExtension.class)
-@WebAppConfiguration
-@ContextConfiguration(classes = WebConfiguration.class)
+@JdbcTest
+@Import(JdbcCommentRepository.class)
+@ActiveProfiles("test")
 @TestPropertySource(locations = "classpath:test-application.properties")
-class JdbcCommentRepositoryTest {
+public class JdbcCommentRepositoryTest {
+
+    @Autowired
+    private CommentRepository commentRepository;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
-    @Autowired
-    private CommentRepository commentRepository;
 
     @BeforeEach
     void setUp() {
@@ -49,7 +50,6 @@ class JdbcCommentRepositoryTest {
     void shouldAddComment() {
         String text = "Second comment for first post";
         commentRepository.addComment(1L, text);
-
         String sql = "SELECT id, text, postId FROM comments WHERE id = ?";
         Comment comment = getComment(3L, sql);
 
@@ -62,7 +62,6 @@ class JdbcCommentRepositoryTest {
         String sqlForPost = "SELECT id, title, text, likesCount, tags FROM posts WHERE id = ?";
         Post post = getPost(1L, sqlForPost);
         commentRepository.editCommentOfPost(post, 1L, "New comment");
-
         String sqlForComment = "SELECT id, text, postId FROM comments WHERE id = ?";
         Comment comment = getComment(1L, sqlForComment);
 
@@ -74,7 +73,6 @@ class JdbcCommentRepositoryTest {
     void shouldGetCommentsOfPost() {
         String sql = "SELECT id, title, text, likesCount, tags FROM posts WHERE id = ?";
         Post post = getPost(1L, sql);
-
         List<Comment> listOfComments = post.getComments();
 
         assertNotNull(listOfComments);
@@ -84,17 +82,14 @@ class JdbcCommentRepositoryTest {
     @Test
     void shouldDeleteCommentOfPost() {
         commentRepository.deleteCommentOfPost(1L, 1L);
-
         String sql = "SELECT id, title, text, likesCount, tags FROM posts WHERE id = ?";
         Post post = getPost(1L, sql);
         List<Comment> listOfComments = post.getComments();
 
         assertTrue(listOfComments.isEmpty());
-
     }
 
     private Comment getComment(Long id, String sql) {
-
         Comment comment = jdbcTemplate.query(
                 sql,
                 new Object[]{id},

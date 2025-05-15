@@ -1,7 +1,7 @@
-package com.github.maximslepukhin.mapper;
+package com.github.maximslepukhin.myblog.mapper;
 
-import com.github.maximslepukhin.dto.PostDto;
-import com.github.maximslepukhin.model.Post;
+import com.github.maximslepukhin.myblog.dto.PostDto;
+import com.github.maximslepukhin.myblog.model.Post;
 
 import java.util.Arrays;
 import java.util.List;

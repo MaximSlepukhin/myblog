@@ -1,8 +1,8 @@
-package com.github.maximslepukhin.service;
+package com.github.maximslepukhin.myblog.service;
 
-import com.github.maximslepukhin.dto.PostDto;
-import com.github.maximslepukhin.model.Post;
-import com.github.maximslepukhin.model.PostsResult;
+import com.github.maximslepukhin.myblog.dto.PostDto;
+import com.github.maximslepukhin.myblog.model.Post;
+import com.github.maximslepukhin.myblog.model.PostsResult;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;

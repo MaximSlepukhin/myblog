@@ -1,32 +1,33 @@
 package com.github.maximslepukhin.repository;
 
-import com.github.maximslepukhin.WebConfiguration;
-import com.github.maximslepukhin.model.Post;
+import com.github.maximslepukhin.myblog.model.Post;
+import com.github.maximslepukhin.myblog.repository.JdbcPostRepository;
+import com.github.maximslepukhin.myblog.repository.PostRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-
-@ExtendWith(SpringExtension.class)
-@WebAppConfiguration
-@ContextConfiguration(classes = WebConfiguration.class)
+@JdbcTest
+@Import(JdbcPostRepository.class)
+@ActiveProfiles("test")
 @TestPropertySource(locations = "classpath:test-application.properties")
 class JdbcPostRepositoryTest {
 
     @Autowired
-    private JdbcTemplate jdbcTemplate;
-    @Autowired
     private PostRepository postRepository;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @BeforeEach
     void setUp() {
@@ -47,14 +48,12 @@ class JdbcPostRepositoryTest {
 
     @Test
     void findAll_shouldReturnAllPosts() {
-        List<Post> posts = postRepository.findPosts(10, 1);
+        List<Post> posts = postRepository.findPosts(2, 1);
 
-        assertNotNull(posts);
         assertEquals(2, posts.size());
-
-        Post post = posts.getFirst();
-        assertEquals("First title", post.getTitle());
-        assertEquals("First text", post.getText());
+        assertThat(posts).isNotNull();
+        assertEquals("First title", posts.get(0).getTitle());
+        assertEquals("Second title", posts.get(1).getTitle());
     }
 
     @Test
@@ -71,7 +70,6 @@ class JdbcPostRepositoryTest {
     void shouldSavePost() {
         Post post = new Post(0L, "Third title", "Third text", 3, "tags3", null);
         postRepository.savePost(post);
-
         Post savedPost = postRepository.findPosts(10, 1).stream()
                 .filter(createdPost -> createdPost.getId().equals(3L))
                 .findFirst()
@@ -81,13 +79,11 @@ class JdbcPostRepositoryTest {
         assertEquals("Third title", savedPost.getTitle());
         assertEquals("Third text", savedPost.getText());
         assertEquals(3L, savedPost.getId());
-
     }
 
     @Test
     void should_addLike() {
         postRepository.addLike(1L, true);
-
         Post post = postRepository.findById(1L);
 
         assertNotNull(post);
@@ -98,7 +94,6 @@ class JdbcPostRepositoryTest {
     void shouldUpdatePost() {
         Post post = new Post(1L, "Updated title", "Updated text", 1, "tags1", null);
         postRepository.updatePost(post);
-
         Post updatedPost = postRepository.findById(post.getId());
 
         assertNotNull(updatedPost);
@@ -111,9 +106,7 @@ class JdbcPostRepositoryTest {
     @Test
     void shouldDeletePostById() {
         postRepository.deletePostById(1L);
-
         List<Post> posts = postRepository.findPosts(10, 1);
-
         boolean contains = posts.stream()
                 .noneMatch(createdPosts -> createdPosts.getId().equals(1L));
 

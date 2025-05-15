@@ -1,4 +1,4 @@
-package com.github.maximslepukhin.model;
+package com.github.maximslepukhin.myblog.model;
 
 public class PageInfo {
     private int pageNumber;
@@ -21,11 +21,9 @@ public class PageInfo {
         return pageSize;
     }
 
-
     public boolean hasNext() {
         return hasNext;
     }
-
 
     public boolean hasPrevious() {
         return hasPrevious;

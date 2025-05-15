@@ -1,8 +1,7 @@
-package com.github.maximslepukhin.service;
+package com.github.maximslepukhin.myblog.service;
 
-import com.github.maximslepukhin.model.Comment;
-import com.github.maximslepukhin.model.Post;
-import com.github.maximslepukhin.repository.CommentRepository;
+import com.github.maximslepukhin.myblog.model.Post;
+import com.github.maximslepukhin.myblog.repository.CommentRepository;
 import org.springframework.stereotype.Service;
 
 @Service

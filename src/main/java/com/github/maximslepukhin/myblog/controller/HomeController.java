@@ -1,11 +1,11 @@
-package com.github.maximslepukhin.controller;
+package com.github.maximslepukhin.myblog.controller;
 
-import com.github.maximslepukhin.dto.PostDto;
-import com.github.maximslepukhin.mapper.PostMapper;
-import com.github.maximslepukhin.model.Post;
-import com.github.maximslepukhin.service.CommentService;
-import com.github.maximslepukhin.service.PostService;
-import com.github.maximslepukhin.model.PostsResult;
+import com.github.maximslepukhin.myblog.dto.PostDto;
+import com.github.maximslepukhin.myblog.mapper.PostMapper;
+import com.github.maximslepukhin.myblog.model.Post;
+import com.github.maximslepukhin.myblog.service.CommentService;
+import com.github.maximslepukhin.myblog.service.PostService;
+import com.github.maximslepukhin.myblog.model.PostsResult;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -133,13 +133,4 @@ public class HomeController {
         postService.deletePostById(id, request);
         return "redirect:/posts";
     }
-
-//    private void m() {
-//        Predicate<Integer> isEven = x -> x % 2 == 0;
-//        Stream<Integer> stream = new ArrayList<>(List.of(1,2,3)).stream();
-//        stream
-//                .filter(isEven)
-//                .forEach(System.out::println);
-//
-//    }
 }

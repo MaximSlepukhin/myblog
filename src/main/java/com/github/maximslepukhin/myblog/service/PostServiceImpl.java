@@ -1,10 +1,10 @@
-package com.github.maximslepukhin.service;
+package com.github.maximslepukhin.myblog.service;
 
-import com.github.maximslepukhin.dto.PostDto;
-import com.github.maximslepukhin.mapper.PostMapper;
-import com.github.maximslepukhin.model.Post;
-import com.github.maximslepukhin.model.PostsResult;
-import com.github.maximslepukhin.repository.PostRepository;
+import com.github.maximslepukhin.myblog.dto.PostDto;
+import com.github.maximslepukhin.myblog.mapper.PostMapper;
+import com.github.maximslepukhin.myblog.model.Post;
+import com.github.maximslepukhin.myblog.model.PostsResult;
+import com.github.maximslepukhin.myblog.repository.PostRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 

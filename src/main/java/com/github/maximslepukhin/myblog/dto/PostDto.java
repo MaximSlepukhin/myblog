@@ -1,6 +1,6 @@
-package com.github.maximslepukhin.dto;
+package com.github.maximslepukhin.myblog.dto;
 
-import com.github.maximslepukhin.model.Comment;
+import com.github.maximslepukhin.myblog.model.Comment;
 import lombok.*;
 
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.github.maximslepukhin.model;
+package com.github.maximslepukhin.myblog.model;
 
 
 import lombok.*;
