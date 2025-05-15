@@ -1,8 +1,6 @@
 package com.github.maximslepukhin.myblog.model;
 
-
 import lombok.*;
-
 import java.util.List;
 
 @Data

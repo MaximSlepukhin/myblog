@@ -1,8 +1,6 @@
 package com.github.maximslepukhin.myblog.repository;
 
 import com.github.maximslepukhin.myblog.model.Post;
-import org.springframework.stereotype.Repository;
-
 import java.util.List;
 
 public interface PostRepository {
