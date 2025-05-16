@@ -1,6 +1,5 @@
 package com.github.maximslepukhin.service;
 
-
 import com.github.maximslepukhin.myblog.model.Post;
 import com.github.maximslepukhin.myblog.model.PostsResult;
 import com.github.maximslepukhin.myblog.repository.PostRepository;
@@ -10,13 +9,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,19 +22,18 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@SpringBootTest
+@Import(PostServiceImpl.class)
+public class PostServiceImplTest {
 
-@ExtendWith(MockitoExtension.class)
-class PostServiceImplTest {
-
-    @Mock
+    @MockBean
     private PostRepository postRepository;
 
-    @Mock
-    HttpServletRequest request;
+    @MockBean
+    private HttpServletRequest request;
 
-    @InjectMocks
+    @Autowired
     private PostServiceImpl postService;
-
 
     @BeforeEach
     void setUp() {
@@ -63,7 +60,7 @@ class PostServiceImplTest {
     }
 
     @Test
-    void shouldFindPostByd() {
+    void shouldFindPostById() {
         Post existingPost = new Post(1L, "Existing Title", "Existing Text", 0,
                 "tags", null);
 
